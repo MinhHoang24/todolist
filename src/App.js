@@ -44,27 +44,47 @@ function App() {
     }
   }, [todoList, isMounted]);
 
+  const onDeleteBtnClick = useCallback((id) => {
+    setTodoList(prev => prev.filter(todo => todo.id !== id));
+  }, [setTodoList]);
+
   const onTextInputChange = useCallback((e) => {
     setTextInput(e.target.value);
   }, []);
 
-  const onAddBtnClick= useCallback((e) => {
-    // them textInput vao ds todoList
+  const onAddBtnClick = useCallback(() => {
+    const trimmedInput = textInput.trim().toLowerCase();
+
+    const isDuplicate = todoList.some(
+      (todo) => todo.name.trim().toLowerCase() === trimmedInput
+    );
+
+    if (isDuplicate) {
+      alert("❌ Công việc này đã tồn tại!");
+      return;
+    }
+
     setTodoList(prev => [
-      { id: v4(), name: textInput, isCompleted: false },
+      { id: v4(), name: textInput.trim(), isCompleted: false },
       ...prev
     ]);
-
     setTextInput("");
-  }, [textInput, setTodoList]);
+  }, [textInput, todoList, setTodoList]);
+
 
   const onCheckBtnClick = useCallback((id) => {
-    setTodoList(prevState => 
-      prevState.map(todo => 
-        todo.id === id ? {...todo, isCompleted: true} : todo
-      )
-    );
-  }, [setTodoList]);
+    setTodoList(prev => {
+      const updatedList = prev.map(todo =>
+        todo.id === id ? { ...todo, isCompleted: true } : todo
+      );
+
+      // 🔽 Tách và sắp xếp lại:
+      const incomplete = updatedList.filter(todo => !todo.isCompleted);
+      const completed = updatedList.filter(todo => todo.isCompleted);
+
+      return [...incomplete, ...completed]; // ⬅ incomplete lên trước, completed xuống dưới
+    });
+    }, [setTodoList]);
 
   return (
     <div className="app-container">
@@ -97,7 +117,11 @@ function App() {
         }}
       ></Textfield>
       
-      <TodoList todoList={todoList} onCheckBtnClick={onCheckBtnClick} />
+      <TodoList
+        todoList={todoList}
+        onCheckBtnClick={onCheckBtnClick}
+        onDeleteBtnClick={onDeleteBtnClick}
+      />
     </div>
   );
 }

@@ -1,51 +1,21 @@
-import Button from '@atlaskit/button'
-import React from 'react'
-import styled, { css } from 'styled-components'
 import CheckIcon from '@atlaskit/icon/glyph/check'
+import TrashIcon from "@atlaskit/icon/glyph/trash"; // hoặc bất kỳ icon nào bạn dùng
 
-const ButtonStyled = styled(Button)`
-    margin-top: 5px;
-    text-align: left;
-
-    &, &:hover{
-        ${p => 
-            p.$completed &&
-            css`
-            text-decoration: line-through;    
-            `
-        }
-    }
-
-    &:hover {
-        .check-icon {
-            display: inline-block;
-        }
-    }
-
-    .check-icon {
-        display: none;
-
-        &:hover {
-            background-color: #e2e2e2;
-            border-radius: 3px;
-        }
-    }
-`
-
-export default function Todo({ todo, onCheckBtnClick }) {
+export default function Todo({ todo, onCheckBtnClick, onDeleteBtnClick }) {
   return (
-    <ButtonStyled 
-        $completed={todo.isCompleted}
-        shouldFitContainer 
-        iconAfter={ 
-            !todo.isCompleted && (
-                <span className='check-icon' onClick={() => onCheckBtnClick(todo.id)}>
-                    <CheckIcon primaryColor='#4fff4f' />
-                </span>
-            )    
-        }
-    >
-        {todo.name}
-    </ButtonStyled>
-    );
+    <div className={`todo-item ${todo.isCompleted ? 'completed' : ''}`}>
+      <span>{todo.name}</span>
+      <div style={{ display: "flex", gap: "8px" }}>
+        {!todo.isCompleted ? (
+          <span className="check-icon" onClick={() => onCheckBtnClick(todo.id)}>
+            <CheckIcon primaryColor="#4fff4f" />
+          </span>
+        ) : (
+          <span className="check-icon" onClick={() => onDeleteBtnClick(todo.id)}>
+            <TrashIcon primaryColor="#ff4f4f" />
+          </span>
+        )}
+      </div>
+    </div>
+  );
 }
